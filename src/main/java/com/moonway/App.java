@@ -40,24 +40,7 @@ import java.util.Random;
 @MapperScan("com.moonway.dao")
 public class App{
 
-    @Autowired
-    private HttpServletRequest httpServletRequest;
 
-
-    @RequestMapping("/getotp")
-    @ResponseBody
-    public CommonReturnType getOtp(@RequestParam(name ="mobile")String mobile){
-        Random random = new Random();
-        int randomInt = random.nextInt(99999);
-        randomInt += 10000;
-        String optCode = String.valueOf(randomInt);
-
-        httpServletRequest.getSession().setAttribute(mobile,optCode);
-        System.out.println("本次code:"+optCode);
-
-        return CommonReturnType.create(null);
-
-    }
 
 
     public static void main( String[] args )

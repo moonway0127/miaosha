@@ -35,7 +35,7 @@ public class CommonReturnType {
     }
 
     public enum STATUS {
-        SUCCESSFUL("successful"),
+        SUCCESSFUL("success"),
         FAIL("fail");
 
         private String str_status;

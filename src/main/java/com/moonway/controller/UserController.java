@@ -8,19 +8,24 @@ import com.moonway.response.CommonReturnType;
 import com.moonway.service.UserService;
 import com.moonway.service.impl.UserServiceImpl;
 import com.moonway.service.model.UserModel;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+
+
 import javax.net.ssl.SSLEngineResult;
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-@CrossOrigin()
+@CrossOrigin(allowCredentials = "true",origins = "*",allowedHeaders = "*")
 @Controller("user")
 @RequestMapping("/user")
 public class UserController extends BaseController{
@@ -61,24 +66,34 @@ public class UserController extends BaseController{
         randomInt += 10000;
         String optCode = String.valueOf(randomInt);
         httpServletRequest.getSession().setAttribute(mobile,optCode);
+
+        System.out.println(httpServletRequest.getRemoteHost());
+        System.out.println(httpServletRequest.getRemoteAddr());
+        System.out.println(httpServletRequest.getRemotePort());
+        System.out.println(httpServletRequest.getSession().getId());
         System.out.println("本次code:"+optCode);
-        return CommonReturnType.create(null);
+        return CommonReturnType.create("success");
 
     }
 
 
-    @RequestMapping(value = "/regist")
+    @RequestMapping(value = "/regist",method = RequestMethod.POST,consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType register(@RequestParam(name = "mobile")String mobile,
                                      @RequestParam(name = "otpCode")String otpCode,
                                      @RequestParam(name = "name")String name,
                                      @RequestParam(name = "gender")Byte gender,
-                                     @RequestParam(name = "age")Integer age
+                                     @RequestParam(name = "age")Integer age,
+                                     @RequestParam(name = "pwd") String pwd
                                      ) throws BusinessException {
         //验证手机号与otpCode
 
-        String sessionOtpCode = (String) httpServletRequest.getSession().getAttribute(mobile);
-        if(StringUtils.equals(sessionOtpCode,otpCode)){
+        String sessionOtpCode = (String) this.httpServletRequest.getSession().getAttribute(mobile);
+        System.out.println(httpServletRequest.getRemoteHost());
+        System.out.println(httpServletRequest.getRemoteAddr());
+        System.out.println(httpServletRequest.getRemotePort());
+        System.out.println(httpServletRequest.getSession().getId());
+        if(!StringUtils.equals(sessionOtpCode,otpCode)){
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不正确");
         }
         UserModel userModel = new UserModel();
@@ -86,7 +101,12 @@ public class UserController extends BaseController{
         userModel.setMobile(mobile);
         userModel.setName(name);
         userModel.setGender(gender);
+
+        userModel.setEncrptPassword(Base64.encodeBase64(pwd.getBytes()).toString());
         userService.register(userModel);
+
+
+
 
         return CommonReturnType.create("success");
     }
@@ -96,6 +116,7 @@ public class UserController extends BaseController{
 
 
     public UserVO convertFromModel(UserModel userModel){
+
         if(userModel == null){
 
             return null;

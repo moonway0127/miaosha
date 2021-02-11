@@ -12,6 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.beans.Transient;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -30,6 +33,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void register(UserModel userModel) throws BusinessException {
 
         if(userModel==null||StringUtils.isEmpty(userModel.getName())||
@@ -37,7 +41,22 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
         UserDO userDO = convertFromModel(userModel);
+        convertFromModel(userModel);
         userDOMapper.insertSelective(userDO);
+        userModel.setId(userDO.getId());
+        UserPasswordDO userPasswordDO =   convertPwdFromModel(userModel);
+        userPasswordDOMapper.insertSelective(userPasswordDO);
+
+    }
+
+    private UserPasswordDO convertPwdFromModel(UserModel userModel){
+        if (userModel == null){
+            return null;
+        }
+        UserPasswordDO userPasswordDO = new UserPasswordDO();
+        userPasswordDO.setEncrptPassword(userModel.getEncrptPassword());
+        userPasswordDO.setUserId(userModel.getId());
+        return userPasswordDO;
     }
 
     private UserDO convertFromModel(UserModel userModel){

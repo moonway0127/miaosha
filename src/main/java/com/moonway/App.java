@@ -16,6 +16,7 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,6 +39,7 @@ import java.util.Random;
 @SpringBootApplication(scanBasePackages = {"com.moonway"})
 @RestController
 @MapperScan("com.moonway.dao")
+@EnableTransactionManagement
 public class App{
 
 

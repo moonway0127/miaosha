@@ -8,22 +8,17 @@ import com.moonway.response.CommonReturnType;
 import com.moonway.service.UserService;
 import com.moonway.service.impl.UserServiceImpl;
 import com.moonway.service.model.UserModel;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.tomcat.util.security.MD5Encoder;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-
-
-import javax.net.ssl.SSLEngineResult;
 import javax.servlet.http.HttpServletRequest;
+
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @CrossOrigin(allowCredentials = "true",origins = "*",allowedHeaders = "*")
 @Controller("user")
@@ -66,7 +61,6 @@ public class UserController extends BaseController{
         randomInt += 10000;
         String optCode = String.valueOf(randomInt);
         httpServletRequest.getSession().setAttribute(mobile,optCode);
-
         System.out.println(httpServletRequest.getRemoteHost());
         System.out.println(httpServletRequest.getRemoteAddr());
         System.out.println(httpServletRequest.getRemotePort());
@@ -76,6 +70,18 @@ public class UserController extends BaseController{
 
     }
 
+
+    /***
+     * 注册
+     * @param mobile
+     * @param otpCode
+     * @param name
+     * @param gender
+     * @param age
+     * @param pwd
+     * @return
+     * @throws BusinessException
+     */
 
     @RequestMapping(value = "/regist",method = RequestMethod.POST,consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
@@ -102,7 +108,7 @@ public class UserController extends BaseController{
         userModel.setName(name);
         userModel.setGender(gender);
 
-        userModel.setEncrptPassword(Base64.encodeBase64(pwd.getBytes()).toString());
+        userModel.setEncrptPassword(pwd_En_BASE64(pwd));
         userService.register(userModel);
 
 
@@ -111,6 +117,32 @@ public class UserController extends BaseController{
         return CommonReturnType.create("success");
     }
 
+
+    /***
+     * 登录
+     * @param mobile
+     * @param password
+     * @return
+     * @throws BusinessException
+     */
+
+    @RequestMapping(value = "/login",method = RequestMethod.POST,consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name="mobile")String mobile,
+                                  @RequestParam(name="pwd")String password) throws BusinessException {
+
+        if(mobile.isEmpty()||password.isEmpty())
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        UserModel userModel = new UserModel();
+        userModel.setMobile(mobile);
+        userModel.setEncrptPassword(pwd_En_BASE64(password));
+        UserModel findUser = userService.login(userModel);
+
+        if(findUser == null) throw new BusinessException(EmBusinessError.USER_LOGIN_NOT_MATCH);
+
+        return CommonReturnType.create(findUser);
+
+    }
 
 
 
@@ -125,6 +157,19 @@ public class UserController extends BaseController{
         BeanUtils.copyProperties(userModel, userVO);
         return userVO;
     }
+
+    public String pwd_En_BASE64(String pwd){
+
+
+        return Base64.getEncoder().encodeToString(pwd.getBytes());
+
+    }
+
+    public String pwd_De_BASE64(String pwd){
+
+        return new String(Base64.getDecoder().decode(pwd));
+    }
+
 
 
     @Override

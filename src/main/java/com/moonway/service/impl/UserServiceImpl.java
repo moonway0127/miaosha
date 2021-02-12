@@ -11,6 +11,7 @@ import com.moonway.service.model.UserModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private UserPasswordDOMapper userPasswordDOMapper;
     @Override
     public UserModel getUserById(Integer id) {
-      UserDO userDo =   userDOMapper.selectByPrimaryKey(id);
+      UserDO userDo =  userDOMapper.selectByPrimaryKey(id);
       if(userDo == null){
           return null;
       }
@@ -44,8 +45,26 @@ public class UserServiceImpl implements UserService {
         convertFromModel(userModel);
         userDOMapper.insertSelective(userDO);
         userModel.setId(userDO.getId());
-        UserPasswordDO userPasswordDO =   convertPwdFromModel(userModel);
+        UserPasswordDO userPasswordDO =  convertPwdFromModel(userModel);
         userPasswordDOMapper.insertSelective(userPasswordDO);
+
+    }
+
+    @Override
+    public UserModel login( UserModel userModel)  {
+
+        UserDO userDO = userDOMapper.selectByMobile(userModel.getMobile());
+        if(userDO == null ||userDO.getId() ==null||userDO.getId() == 0 ){
+            return null;
+        }
+
+        UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
+
+        if(userPasswordDO == null||!userPasswordDO.getEncrptPassword().equals(userModel.getEncrptPassword())) {
+            return null;
+        }
+        return convertFromDataObject(userDO,userPasswordDO);
+
 
     }
 

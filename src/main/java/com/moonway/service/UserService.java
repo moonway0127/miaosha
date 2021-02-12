@@ -8,4 +8,6 @@ public interface UserService {
 
     void register(UserModel userModel) throws BusinessException;
 
+    UserModel login(UserModel userModel) ;
+
 }

@@ -29,6 +29,7 @@ import java.io.Reader;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 
 /**
@@ -49,6 +50,7 @@ public class App{
     {
         System.out.println( "Hello World!" );
         SpringApplication.run(App.class,args);
+
 
     }
 

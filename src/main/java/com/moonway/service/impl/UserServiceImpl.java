@@ -8,6 +8,8 @@ import com.moonway.error.BusinessException;
 import com.moonway.error.EmBusinessError;
 import com.moonway.service.UserService;
 import com.moonway.service.model.UserModel;
+import com.moonway.validator.ValidationResult;
+import com.moonway.validator.ValidatorImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,14 @@ import java.beans.Transient;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+
     @Autowired
     private UserDOMapper userDOMapper;
     @Autowired
     private UserPasswordDOMapper userPasswordDOMapper;
+    @Autowired
+    private ValidatorImpl validator;
     @Override
     public UserModel getUserById(Integer id) {
       UserDO userDo =  userDOMapper.selectByPrimaryKey(id);
@@ -37,10 +43,16 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void register(UserModel userModel) throws BusinessException {
 
-        if(userModel==null||StringUtils.isEmpty(userModel.getName())||
-            userModel.getGender()==null || userModel.getAge()==null || StringUtils.isEmpty(userModel.getMobile())){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+//        if(userModel==null||StringUtils.isEmpty(userModel.getName())||
+//            userModel.getGender()==null || userModel.getAge()==null || StringUtils.isEmpty(userModel.getMobile())){
+//            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+//        }
+
+        ValidationResult result = validator.validate(userModel);
+        if(result.isHasErrors()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,result.getErrMsg());
         }
+
         UserDO userDO = convertFromModel(userModel);
         convertFromModel(userModel);
         userDOMapper.insertSelective(userDO);
@@ -57,7 +69,6 @@ public class UserServiceImpl implements UserService {
         if(userDO == null ||userDO.getId() ==null||userDO.getId() == 0 ){
             return null;
         }
-
         UserPasswordDO userPasswordDO = userPasswordDOMapper.selectByUserId(userDO.getId());
 
         if(userPasswordDO == null||!userPasswordDO.getEncrptPassword().equals(userModel.getEncrptPassword())) {

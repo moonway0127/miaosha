@@ -99,7 +99,7 @@ public class UserController extends BaseController{
         System.out.println(httpServletRequest.getRemoteAddr());
         System.out.println(httpServletRequest.getRemotePort());
         System.out.println(httpServletRequest.getSession().getId());
-        if(!StringUtils.equals(sessionOtpCode,otpCode)){
+        if(StringUtils.equals(sessionOtpCode,otpCode)){
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"短信验证码不正确");
         }
         UserModel userModel = new UserModel();
@@ -110,9 +110,6 @@ public class UserController extends BaseController{
 
         userModel.setEncrptPassword(pwd_En_BASE64(pwd));
         userService.register(userModel);
-
-
-
 
         return CommonReturnType.create("success");
     }

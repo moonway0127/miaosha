@@ -2,8 +2,8 @@ package com.moonway.service.impl;
 
 import com.moonway.dao.ItemStockDOMapper;
 import com.moonway.dao.OrderItemDOMapper;
-import com.moonway.dataobject.ItemStockDO;
-import com.moonway.dataobject.OrderItemDO;
+import com.moonway.dto.ItemStockDO;
+import com.moonway.dto.OrderItemDO;
 import com.moonway.error.BusinessException;
 import com.moonway.error.EmBusinessError;
 import com.moonway.service.ItemService;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -51,8 +52,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemModel> listItem() {
-        return null;
+
+        List<OrderItemDO> orderItemDOS =  orderItemDOMapper.selectAllItem();
+
+        List<ItemModel> list = orderItemDOS.stream().map( itemDO ->{
+            ItemStockDO itemStockDO = itemStockDOMapper.selectByItemId(itemDO.getId());
+            return convertItemModelFromDO(itemDO,itemStockDO);
+        }).collect(Collectors.toList());
+
+        return list;
     }
+
+
 
     @Override
     public ItemModel getItemById(Integer id) {
@@ -66,12 +77,19 @@ public class ItemServiceImpl implements ItemService {
         return convertItemModelFromDO(orderItemDO,itemStockDO);
     }
 
+    @Transactional
+    @Override
+    public boolean decreaseStock(Integer itemId, Integer amount) {
+
+        return itemStockDOMapper.decreaseStock(itemId,amount)>0?true:false;
+    }
+
 
     private ItemModel convertItemModelFromDO(OrderItemDO orderItemDO ,ItemStockDO itemStockDO){
         ItemModel itemModel = new ItemModel();
         BeanUtils.copyProperties(orderItemDO,itemModel);
         itemModel.setPrice(BigDecimal.valueOf(orderItemDO.getPrice()));
-        itemModel.setSales(itemStockDO.getStock());
+        itemModel.setStock(itemStockDO.getStock());
         return itemModel;
     }
 

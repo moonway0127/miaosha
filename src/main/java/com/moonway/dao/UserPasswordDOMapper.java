@@ -1,6 +1,6 @@
 package com.moonway.dao;
 
-import com.moonway.dataobject.UserPasswordDO;
+import com.moonway.dto.UserPasswordDO;
 
 public interface UserPasswordDOMapper {
     /**

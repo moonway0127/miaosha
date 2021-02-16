@@ -1,6 +1,6 @@
 package com.moonway.dao;
 
-import com.moonway.dataobject.UserDO;
+import com.moonway.dto.UserDO;
 
 public interface UserDOMapper {
     /**

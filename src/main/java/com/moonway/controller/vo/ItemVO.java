@@ -1,48 +1,26 @@
-package com.moonway.service.model;
-
-import org.springframework.lang.Nullable;
+package com.moonway.controller.vo;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public class ItemModel {
-
-    public ItemModel(){
-    }
-
-    public ItemModel(String title, BigDecimal price, Integer stock, String description, String imgUrl, @Nullable Integer sales){
-        this.title = title;
-        this.price = price;
-        this.stock = stock;
-        this.description = description;
-        this.sales = sales;
-        this.ImgUrl = imgUrl;
-
-    }
-
+public class ItemVO {
     private Integer id;
 
-
-    @NotBlank(message = "商品名不能为空")
     private String title;
 
-    @NotNull(message = "价格不能为空")
-    @Min(value = 0 , message = "商品价格不能为0")
     private BigDecimal price;
 
-    @NotNull(message = "库存不能为空")
+
     private Integer stock;
 
-    @NotBlank(message = "描述不能为空")
+
     private String description;
 
     private Integer sales;
 
-    @NotBlank(message = "图片连接不能为空")
     private String ImgUrl;
-
 
     public Integer getId() {
         return id;
@@ -99,8 +77,4 @@ public class ItemModel {
     public void setImgUrl(String imgUrl) {
         ImgUrl = imgUrl;
     }
-
-
-
-
 }

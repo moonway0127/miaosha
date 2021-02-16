@@ -2,22 +2,18 @@ package com.moonway.service.impl;
 
 import com.moonway.dao.UserDOMapper;
 import com.moonway.dao.UserPasswordDOMapper;
-import com.moonway.dataobject.UserDO;
-import com.moonway.dataobject.UserPasswordDO;
+import com.moonway.dto.UserDO;
+import com.moonway.dto.UserPasswordDO;
 import com.moonway.error.BusinessException;
 import com.moonway.error.EmBusinessError;
 import com.moonway.service.UserService;
 import com.moonway.service.model.UserModel;
 import com.moonway.validator.ValidationResult;
 import com.moonway.validator.ValidatorImpl;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.beans.Transient;
 
 @Service
 public class UserServiceImpl implements UserService {

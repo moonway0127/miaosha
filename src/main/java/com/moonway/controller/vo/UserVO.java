@@ -1,4 +1,4 @@
-package com.moonway.controller.viewobject;
+package com.moonway.controller.vo;
 
 public class UserVO {
     private Integer id;

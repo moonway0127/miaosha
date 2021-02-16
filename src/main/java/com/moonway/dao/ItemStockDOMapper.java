@@ -1,6 +1,7 @@
 package com.moonway.dao;
 
-import com.moonway.dataobject.ItemStockDO;
+import com.moonway.dto.ItemStockDO;
+import org.apache.ibatis.annotations.Param;
 
 public interface ItemStockDOMapper {
     /**
@@ -54,4 +55,8 @@ public interface ItemStockDOMapper {
      * @mbg.generated Sun Feb 14 18:02:31 CST 2021
      */
     int updateByPrimaryKey(ItemStockDO record);
+
+
+    int decreaseStock(@Param("itemId") Integer itemId, @Param("amount") Integer amount);
+
 }

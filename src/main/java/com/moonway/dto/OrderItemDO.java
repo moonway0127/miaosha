@@ -1,4 +1,4 @@
-package com.moonway.dataobject;
+package com.moonway.dto;
 
 public class OrderItemDO {
     /**

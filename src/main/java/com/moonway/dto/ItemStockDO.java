@@ -1,4 +1,6 @@
-package com.moonway.dataobject;
+package com.moonway.dto;
+
+import org.apache.ibatis.annotations.Param;
 
 public class ItemStockDO {
     /**
@@ -99,4 +101,5 @@ public class ItemStockDO {
     public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
+
 }

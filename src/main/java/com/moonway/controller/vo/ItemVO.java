@@ -1,5 +1,7 @@
 package com.moonway.controller.vo;
 
+import org.joda.time.DateTime;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,6 +23,16 @@ public class ItemVO {
     private Integer sales;
 
     private String ImgUrl;
+
+    //0 没有 1 待开始 2 进行中
+    private Integer promoStatus;
+
+    private  BigDecimal promoPrice;
+
+    private  Integer promoId;
+
+    private String startTime;
+
 
     public Integer getId() {
         return id;
@@ -76,5 +88,38 @@ public class ItemVO {
 
     public void setImgUrl(String imgUrl) {
         ImgUrl = imgUrl;
+    }
+
+
+    public Integer getPromoStatus() {
+        return promoStatus;
+    }
+
+    public void setPromoStatus(Integer promoStatus) {
+        this.promoStatus = promoStatus;
+    }
+
+    public BigDecimal getPromoPrice() {
+        return promoPrice;
+    }
+
+    public void setPromoPrice(BigDecimal promoPrice) {
+        this.promoPrice = promoPrice;
+    }
+
+    public Integer getPromoId() {
+        return promoId;
+    }
+
+    public void setPromoId(Integer promoId) {
+        this.promoId = promoId;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
     }
 }

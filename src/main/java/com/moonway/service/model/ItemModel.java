@@ -44,6 +44,9 @@ public class ItemModel {
     private String ImgUrl;
 
 
+    private PromoModel promoModel;
+
+
     public Integer getId() {
         return id;
     }
@@ -101,6 +104,11 @@ public class ItemModel {
     }
 
 
+    public PromoModel getPromoModel() {
+        return promoModel;
+    }
 
-
+    public void setPromoModel(PromoModel promoModel) {
+        this.promoModel = promoModel;
+    }
 }

@@ -134,6 +134,9 @@ public class UserController extends BaseController{
 
         if(findUser == null) throw new BusinessException(EmBusinessError.USER_LOGIN_NOT_MATCH);
 
+        this.httpServletRequest.getSession().setAttribute("IS_LOGIN",true);
+        this.httpServletRequest.getSession().setAttribute("LOGIN_USER",findUser);
+
         return CommonReturnType.create(findUser);
 
     }

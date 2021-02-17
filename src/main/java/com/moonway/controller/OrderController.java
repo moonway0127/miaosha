@@ -1,67 +1,50 @@
 package com.moonway.controller;
 
-import com.moonway.controller.vo.ItemVO;
-import com.moonway.dto.OrderItemDO;
+
 import com.moonway.error.BusinessException;
 import com.moonway.error.EmBusinessError;
 import com.moonway.response.CommonReturnType;
-import com.moonway.service.ItemService;
-import com.moonway.service.impl.ItemServiceImpl;
-import com.moonway.service.model.ItemModel;
-import org.springframework.beans.BeanUtils;
+import com.moonway.service.OrderService;
+import com.moonway.service.model.OrderModel;
+import com.moonway.service.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 
-@CrossOrigin(allowCredentials = "true",origins = "*",allowedHeaders = "*")
+@CrossOrigin(allowCredentials = "true", origins = "*", allowedHeaders = "*")
 @Controller("order")
 @RequestMapping("/order")
-public class OrderController extends BaseController{
-
+public class OrderController extends BaseController {
     @Autowired
-    ItemService itemService;
+    OrderService orderService;
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
-    @RequestMapping(value = "/createItem",method = RequestMethod.POST,consumes = {CONTENT_TYPE_FORMED})
+    //封装下单请求
+
+    @RequestMapping(value = "/createorder",method = RequestMethod.POST,consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    private CommonReturnType createItem(@RequestParam(name = "title")String title,
-                                        @RequestParam(name = "price") BigDecimal price,
-                                        @RequestParam(name = "stock")Integer stock,
-                                        @RequestParam(name = "description")String description,
-                                        @RequestParam(name = "imgUrl")String imgUrl
-                                        ) throws BusinessException {
-        return CommonReturnType.create(convertItemVOFromModel(itemService.createItem(new ItemModel(title,price,stock,description,imgUrl,null))));
+    public CommonReturnType createOrder(@RequestParam(name = "itemId") Integer itemId,
+                                        @RequestParam(name = "amount") Integer amount,
+                                        @RequestParam(name = "promoId",required = false) Integer promoId) throws BusinessException {
+
+        Boolean isLogin = (Boolean) httpServletRequest.getSession().getAttribute("IS_LOGIN");
+        if (isLogin == null || !isLogin.booleanValue())
+            throw new BusinessException(EmBusinessError.USER_NOT_LOGIN);
+
+
+        //获取用户的登录信息
+        UserModel userModel = (UserModel) httpServletRequest.getSession().getAttribute("LOGIN_USER");
+
+
+        OrderModel orderModel = orderService.createOrder(userModel.getId(), itemId, amount,promoId);
+
+
+        return CommonReturnType.create(orderModel);
     }
-
-
-    @RequestMapping("/getitem")
-    @ResponseBody
-    private CommonReturnType getItem(@RequestParam(name = "id")Integer id) throws BusinessException {
-        ItemModel itemModel = itemService.getItemById(id);
-        if (itemModel==null||itemModel.getId()==null) throw new BusinessException(EmBusinessError.ITEM_NOT_EXISTS);
-        return CommonReturnType.create(convertItemVOFromModel(itemModel));
-    }
-
-    @RequestMapping("/getAllItem")
-    @ResponseBody
-    private CommonReturnType getAllItem(){
-        List<ItemVO> itemVOS = itemService.listItem().stream().map(item -> convertItemVOFromModel(item)
-        ).collect(Collectors.toList());
-        return CommonReturnType.create(itemVOS);
-    }
-
-
-    private ItemVO convertItemVOFromModel(ItemModel itemModel){
-        ItemVO itemVO = new ItemVO();
-        BeanUtils.copyProperties(itemModel,itemVO);
-        return itemVO;
-
-    }
-
-
 
 
 }

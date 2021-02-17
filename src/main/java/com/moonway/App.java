@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+
 
 /**
  * Hello world!
@@ -27,7 +29,7 @@ public class App{
         System.out.println( "Hello World!" );
         SpringApplication.run(App.class,args);
 
-
+        HashMap<Integer,Integer> hashMap = new HashMap<>(1,1);
     }
 
 

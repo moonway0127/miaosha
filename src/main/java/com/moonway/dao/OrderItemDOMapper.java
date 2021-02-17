@@ -1,6 +1,7 @@
 package com.moonway.dao;
 
 import com.moonway.dto.OrderItemDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -54,4 +55,6 @@ public interface OrderItemDOMapper {
      * @mbg.generated Sun Feb 14 18:02:31 CST 2021
      */
     int updateByPrimaryKey(OrderItemDO record);
+
+    int increaseSales(@Param("id") Integer id,@Param("amount")Integer amount);
 }

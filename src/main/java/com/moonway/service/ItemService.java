@@ -20,4 +20,6 @@ public interface ItemService {
 
     boolean decreaseStock(Integer itemId,Integer amount);
 
+    void increaseSales(Integer itemId,Integer amount);
+
 }

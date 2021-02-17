@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional
     @Override
-    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount) throws BusinessException {
+    public OrderModel createOrder(Integer userId, Integer itemId, Integer amount,Integer promoId) throws BusinessException {
         //1.校验下单状态，下单是否存在，用户是否合法，购买数量是否正确
         ItemModel itemModel =  itemService.getItemById(itemId);
         if(itemModel ==null) throw  new BusinessException(EmBusinessError.ITEM_NOT_EXISTS);
@@ -51,18 +51,39 @@ public class OrderServiceImpl implements OrderService {
 
         if(amount<=0||amount>99) throw  new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"数量信息不正确");
 
+        //校验活动信息
+        if (promoId!=null){
+            //校验对应活动是否存在
+            if(promoId.intValue()!=itemModel.getPromoModel().getId()){
+                throw  new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动信息不正确");
+
+            }else if(itemModel.getPromoModel().getStatus().intValue()!=2){
+                throw  new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"活动未开始");
+            }
+
+
+        }
 
         //2.落单减库存
         if(!itemService.decreaseStock(itemId,amount)) throw new BusinessException(EmBusinessError.ITEM_STOCK_ENOUGH);
 
         //3.订单入库
         //生成交易订单号
-        OrderModel orderModel = new OrderModel(itemModel.getPrice(),userId,itemId,amount,itemModel.getPrice().multiply(new BigDecimal(amount)));
+        OrderModel orderModel = new OrderModel(null,userId,itemId,amount,null);
+
+        if(promoId !=null){
+            orderModel.setItemPrice(itemModel.getPromoModel().getPromoItemPrice());
+        }else {
+            orderModel.setItemPrice(itemModel.getPrice());
+        }
+
+        orderModel.setOrderPrice(orderModel.getItemPrice().multiply(new BigDecimal(amount)));
         orderModel.setId(generateOrderNo(userId));
+        orderModel.setPromoId(promoId);
         OrderInfoDO orderInfoDO = convertFromOrderModel(orderModel);
         orderInfoDOMapper.insertSelective(orderInfoDO);
+        itemService.increaseSales(itemId,amount);
         //4.返回前端
-
         return orderModel;
     }
 
